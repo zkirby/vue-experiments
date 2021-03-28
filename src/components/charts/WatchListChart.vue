@@ -12,34 +12,62 @@ export default {
   components: {
     LineChart
   },
+  props: {
+    markers: {
+      type: Array
+    },
+    timeframe: {
+      type: String,
+      default: "15min"
+    }
+  },
   data() {
     return {
-      stockData: []
+      stockData: ["S"],
+      borderColor: "red"
     };
   },
-  async mounted() {
-    const rawDataResponse = await getStockDataForTimeFrameMarker(
-      "SPY",
-      "1hour"
-    );
-    const rawData = await rawDataResponse.json();
-    this.stockData = rawData.map(({ date, close }) => ({
-      t: moment(date),
-      y: close
-    }));
+  mounted() {
+    this.markers.forEach(async m => {
+      const rawDataResponse = await getStockDataForTimeFrameMarker(
+        m,
+        this.timeframe
+      );
+      //const rawData = await rawDataResponse.json();
+      const rawData = await rawDataResponse;
+      let lastClose = 0;
+      this.stockData.push([
+        m,
+        rawData
+          .map(({ date, close }) => {
+            let iy = close - lastClose;
+            let y = (iy / lastClose) * 100;
+            lastClose = close;
+            return {
+              t: moment(date),
+              y
+            };
+          })
+          //.filter(o => o.t.dayOfYear() === moment().dayOfYear())
+          .slice(1)
+      ]);
+    });
   },
   computed: {
+    // borderColor() {
+    //   let first = this.stockData[0];
+    //   let last = this.stockData[this.stockData.length - 1];
+    //   return last >= first ? "#00b894" : "#d63031";
+    // },
     chartData() {
       return {
-        datasets: [
-          {
-            label: "Price Data for TOPS at 15min",
-            borderColor: "#00b894",
-            backgroundColor: "#00b894",
-            fill: false,
-            data: this.stockData
-          }
-        ]
+        datasets: this.stockData.map(([m, data]) => ({
+          label: `${m} for ${this.timeframe}`,
+          borderColor: this.borderColor,
+          backgroundColor: this.borderColor,
+          fill: false,
+          data
+        }))
       };
     },
     options() {

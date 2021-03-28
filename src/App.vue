@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <h1>What are we watching?</h1>
-    <watch-list-chart />
+    <h1>What's moving?</h1>
+    <watch-list />
   </div>
 </template>
 
 <script>
-import WatchListChart from "./components/charts/WatchListChart.vue";
+import WatchList from "./components/WatchList.vue";
 
 export default {
   name: "App",
   components: {
-    WatchListChart
+    WatchList
   }
 };
 </script>

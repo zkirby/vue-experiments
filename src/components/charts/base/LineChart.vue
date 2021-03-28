@@ -1,19 +1,15 @@
 <template>
   <div>
-    <canvas ref="canvas" id="line-chart" />
+    <canvas ref="canvas" id="line-chart" height="100" />
   </div>
 </template>
 
 <script>
 import Chart from "chart.js";
+let chart = null;
 
 export default {
   name: "line-chart",
-  data() {
-    return {
-      chart: null
-    };
-  },
   props: {
     opt: {
       default() {
@@ -33,8 +29,8 @@ export default {
   },
   methods: {
     renderChart(data, opt) {
-      if (this.chart) this.chart.destroy();
-      this.chart = new Chart(this.$refs.canvas.getContext("2d"), {
+      if (chart) chart.destroy();
+      chart = new Chart(this.$refs.canvas.getContext("2d"), {
         type: "line",
         data,
         options: opt
